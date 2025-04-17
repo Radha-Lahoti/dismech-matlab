@@ -1,4 +1,4 @@
-function [alpha] = lineSearch(q,q0,dq,u,f,J, stretch_springs, bend_twist_springs, hinge_springs, MultiRod, tau_0, imc, env, sim_params)
+function [alpha] = lineSearch(q,q0,dq,u,f,J, stretch_springs, bend_twist_springs, hinge_springs, MultiRod, tau_0, imc, shell_imc, env, sim_params)
 % Store current q
 q_old = q;
 n_nodes=MultiRod.n_nodes;
@@ -106,9 +106,13 @@ while ~success
     end
 
     if ismember("selfContact", env.ext_force_list) % IMC
-        [Fc, Ffr] = ...
-            IMC_new_only_force(imc, q, q0, sim_params.dt);        
-        f = f - Fc - Ffr;
+%         [Fc, Ffr] = ...
+%             IMC_new_only_force(imc, q, q0, sim_params.dt);        
+%         f = f - Fc - Ffr;
+        [Fc] = ... 
+        IMC_shell_force_only(shell_imc, q, q0, sim_params.dt);
+
+        f = f - Fc;
     end
 
     if ismember("floorContact", env.ext_force_list) % floor contact

@@ -62,7 +62,7 @@ fixed_edge_indices = [];
 input_log_node = 1;
 
 %% initial conditions
-% u_init = [2:3:size(rod_nodes,1)*3; 0.1*ones(1,size(rod_nodes,1))];
+% u_init = [2:3:size(nodes,1)*3; 0.1*ones(1,size(nodes,1))];
 
 %% Plot dimensions
 sim_params.plot_x = [-0.1,0.1];

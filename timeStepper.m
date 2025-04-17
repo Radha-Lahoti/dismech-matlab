@@ -1,5 +1,5 @@
 function [MultiRod, stretch_springs, bend_twist_springs, hinge_springs] = ...
-    timeStepper (MultiRod, stretch_springs, bend_twist_springs, hinge_springs, triangle_springs, tau_0, env, imc, sim_params)
+    timeStepper (MultiRod, stretch_springs, bend_twist_springs, hinge_springs, triangle_springs, tau_0, env, imc, shell_imc, sim_params)
 
 % create local variables in function to store the struct values
 n_nodes=MultiRod.n_nodes;
@@ -129,10 +129,15 @@ while ~solved % % error > sim_params.tol
     end
 
     if ismember("selfContact", env.ext_force_list) % IMC
-        [Fc, Jc, Ffr, Jfr, imc] = ...
-            IMC_new(imc, q, q0, MultiRod.edge_combos, iter, sim_params.dt, f, MultiRod.fixedDOF);
-        f = f - Fc - Ffr;
-        J = J - Jc - Jfr;
+%         [Fc, Jc, Ffr, Jfr, imc] = ...
+%             IMC_new(imc, q, q0, MultiRod.edge_combos, iter, sim_params.dt, f, MultiRod.fixedDOF);
+%         f = f - Fc - Ffr;
+%         J = J - Jc - Jfr;
+
+        [Fc_shell, Jc_shell, Ffr_shell, Jfr_shell, shell_imc] = ...
+            IMC_shell(shell_imc, q, q0, MultiRod.tri_combos, iter, sim_params.dt, f, MultiRod.fixedDOF);
+        f = f - Fc_shell - Ffr_shell;
+        J = J - Jc_shell - Jfr_shell;
     end
 
     if ismember("floorContact", env.ext_force_list) % floor contact
@@ -158,7 +163,7 @@ while ~solved % % error > sim_params.tol
 
     % lineSearch for optimal alpha
     if(sim_params.use_lineSearch && iter>10)
-        alpha = lineSearch(q,q0,dq,u,f,J, stretch_springs, bend_twist_springs, hinge_springs, MultiRod, tau_0, imc, env, sim_params);
+        alpha = lineSearch(q,q0,dq,u,f,J, stretch_springs, bend_twist_springs, hinge_springs, MultiRod, tau_0, imc, shell_imc, env, sim_params);
     else
         alpha = newtonDamper(alpha,iter);
     end

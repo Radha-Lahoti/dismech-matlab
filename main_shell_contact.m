@@ -4,7 +4,7 @@ close all
 % add to path
 addpath springs/
 addpath util_functions/
-addpath contact_functions/
+addpath (genpath('contact_functions'));
 addpath rod_dynamics/
 addpath shell_dynamics/
 addpath external_forces/
@@ -14,7 +14,7 @@ addpath(genpath('experiments'));
 
 % % Examples:
 % robotDescriptionRodCantilever
-robotDescriptionShellCantilever
+robotDescriptionShellContact
 % robotDescriptionParachute
 % robotDescriptionRodContact
 % robotDescriptionSquarePlate
@@ -79,6 +79,9 @@ if(n_triangle==0)
 else
     if(~sim_params.use_midedge)
         triangle_springs = [];
+        if n_hinge==0
+            hinge_springs = [];
+        end
         for h=1:n_hinge
             hinge_springs(h) = hingeSpring (...
                 0, elBendShell(h,:), softRobot, softRobot.kb);
@@ -130,6 +133,9 @@ plot_MultiRod(softRobot, 0.0, sim_params,environment,imc);
 
 %% Initial conditions on velocity / angular velocity (if any)
 
+softRobot.u(12) = u_init;
+softRobot.u(15) = u_init;
+softRobot.u(18) = u_init;
 
 %% Time stepping scheme
 
