@@ -6,16 +6,18 @@ function [Fc, Jc] = computeShellContact(q,  C, delta, contact_len, scale, k_c, n
 % -----------------------------------
 assert(size(C, 2) == 6);
 num_inputs = size(C, 1);
-ind = zeros(1,18);
 Fc = zeros(n_dof,1);
 Jc = zeros(n_dof,n_dof);
 
 K1 = 15*contact_len/(2*delta);
 contact_lim   = scale*(contact_len + delta);
-numerical_lim = scale*(contact_len- delta);
+numerical_lim = scale*(contact_len - delta);
 
 for i = 1:num_inputs
     [dist, constraint_type, tri_combo_input, combo_nodes_updated] = triangleContactType(q, C(i,:), scale);
+%     dist
+    constraint_type
+%     numerical_lim
     %% Contact
     % input
     input = [tri_combo_input', dist, contact_len/2*scale, K1];

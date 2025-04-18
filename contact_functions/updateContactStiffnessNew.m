@@ -17,5 +17,7 @@ for i=1:size(C,1)
     end
 end
 
-contact_stiffness = 1e-2*curr_max_force;
+% contact_stiffness = 1e-2*curr_max_force; % working for shell (except p2t)
+contact_stiffness = 1e-3*curr_max_force; % working for all cases in shell
+% contact_stiffness = 1e-1*curr_max_force;
 % contact_stiffness = 1e5*curr_max_force; % original rod

@@ -36,7 +36,7 @@ function [grad_E1_p2p, grad_E1_p2e, grad_E1_e2e, grad_E1_p2t, grad_E2_p2p, grad_
     % find gradient of Delta wrt [x11; x12; x13; x21; x22; x23]
     x = [x11; x12; x13; x21; x22; x23];
     % grad_Delta_p2p = (jacobian(Delta_p2p, x));
-    grad_Delta_p2p = [x11./Delta_p2p ; zeros(3,1); zeros(3,1); x21./Delta_p2p; zeros(3,1); zeros(3,1)];
+    grad_Delta_p2p = [x11'./Delta_p2p , zeros(1,3), zeros(1,3), x21'./Delta_p2p, zeros(1,3), zeros(1,3)];
 
     grad_Delta_p2e = (jacobian(Delta_p2e, x));
     grad_Delta_e2e = (jacobian(Delta_e2e, x));
@@ -112,8 +112,5 @@ function [grad_E1_p2p, grad_E1_p2e, grad_E1_e2e, grad_E1_p2t, grad_E2_p2p, grad_
     hess_E_shell_con_p2e = matlabFunction(hess_E2_p2e, 'Vars', {input}, "File","hess_E_shell_con_p2e.m");
     hess_E_shell_con_e2e = matlabFunction(hess_E2_e2e, 'Vars', {input}, "File","hess_E_shell_con_e2e.m");
     hess_E_shell_con_p2t = matlabFunction(hess_E2_p2t, 'Vars', {input}, "File","hess_E_shell_con_p2t.m");
-
-
-
 
 end

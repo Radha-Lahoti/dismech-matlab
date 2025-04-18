@@ -20,7 +20,7 @@ if(sim_params.static_sim)
 %     sim_params.totalTime = sim_params.dt;
     sim_params.totalTime = sim_params.dt*5;
 else
-    sim_params.totalTime = 0.8; % sec
+    sim_params.totalTime = 2; % sec
 end
 
 % How often the plot should be shown? (Set plotStep to 1 to show each plot)
@@ -47,7 +47,11 @@ material.contact_stiffness = 0.1;
 material.mu = 0.25;
 
 %% Input text file 
-inputFileName = 'experiments/shellContact/input_twoTriangleContact.txt';
+% inputFileName = 'experiments/shellContact/input_twoTriangleContact.txt';
+% inputFileName = 'experiments/shellContact/input_twoTriangleContact_p2p.txt';
+% inputFileName = 'experiments/shellContact/input_twoTriangleContact_p2e.txt';
+inputFileName = 'experiments/shellContact/input_twoTriangleContact_p2t.txt';
+% inputFileName = 'experiments/shellContact/input_twoTriangleContact_e2e.txt';
 
 % reading the input text file
 [nodes, edges, face_nodes] = inputProcessorNew(inputFileName);

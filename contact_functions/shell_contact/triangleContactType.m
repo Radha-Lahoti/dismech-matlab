@@ -14,6 +14,8 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
     % V1 and V2 are 3x3 matrices: each column is a vertex of the triangle in 3D
 
     min_dist = inf;
+    min_dist1 = inf; min_dist2 = inf; min_dist3 = inf; min_dist4 = inf; min_dist5 = inf; % to debug
+
     contact_type = "";
     contact_info = struct();
 
@@ -33,6 +35,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             d = norm(V1(:,i) - V2(:,j));
             if d < min_dist
                 min_dist = d;
+                min_dist1 = d; % to debug
                 contact_type = "PointToPoint";
                 contact_info = struct('p1', V1(:,i), 'p2', V2(:,j));
                 idx1_pp = i;
@@ -49,6 +52,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             [d, cp] = pointToSegmentDist(V1(:,i), a, b);
             if d < min_dist
                 min_dist = d;
+                min_dist2 = d; % to debug
                 contact_type = "PointToEdge";
                 contact_info = struct('point', V1(:,i), 'edge', [a, b], 'closest_point', cp);
             end
@@ -62,6 +66,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             [d, cp] = pointToSegmentDist(V2(:,i), a, b);
             if d < min_dist
                 min_dist = d;
+                min_dist2 = d; % to debug
                 contact_type = "PointToEdge";
                 contact_info = struct('point', V2(:,i), 'edge', [a, b], 'closest_point', cp);
             end
@@ -78,6 +83,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             [d, p1, p2] = segmentToSegmentDist(a1, b1, a2, b2);
             if d < min_dist
                 min_dist = d;
+                min_dist3 = d; % to debug
                 contact_type = "EdgeToEdge";
                 contact_info = struct('edge1', [a1, b1], 'edge2', [a2, b2], 'p1', p1, 'p2', p2);
             end
@@ -89,6 +95,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
         [d, is_inside] = pointToTriangleDist(V1(:,i), V2);
         if is_inside && d < min_dist
             min_dist = d;
+            min_dist4 = d; % to debug
             contact_type = "PointToFace";
             contact_info = struct('point', V1(:,i), 'triangle', V2);
         end
@@ -96,6 +103,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
         [d, is_inside] = pointToTriangleDist(V2(:,i), V1);
         if is_inside && d < min_dist
             min_dist = d;
+            min_dist4 = d; % to debug
             contact_type = "PointToFace";
             contact_info = struct('point', V2(:,i), 'triangle', V1);
         end
@@ -109,6 +117,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
         if intersects
             if norm(pt - a) > 1e-8 && norm(pt - b) > 1e-8
                 min_dist = 0;
+                min_dist5 = 0; % to debug
                 contact_type = "EdgeToFace";
                 contact_info = struct('edge', [a, b], 'triangle', V2, 'intersection', pt);
                 dist = min_dist;
@@ -122,6 +131,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
         if intersects
             if norm(pt - a) > 1e-8 && norm(pt - b) > 1e-8
                 min_dist = 0;
+                min_dist5 = 0; % to debug
                 contact_type = "EdgeToFace";
                 contact_info = struct('edge', [a, b], 'triangle', V1, 'intersection', pt);
                 dist = min_dist;
@@ -129,10 +139,12 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             end
         end
     end
-
+min_distances = [min_dist1, min_dist2, min_dist3, min_dist4, min_dist5];
     dist = min_dist;
 
     % Rearranging triangles and face nodes for contact types
+    need_to_switch = false;
+
     if contact_type == "PointToPoint"
         updated_tri1 = circshift(V1, [0, 1 - idx1_pp]);
         updated_face_nodes1 = circshift(face_nodes1, [0, 1 - idx1_pp]);
@@ -157,6 +169,7 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             idx_edge_start = find(ismember(V1', edge(:,1)', 'rows'));
             updated_tri1 = circshift(V1, [0, 1 - idx_edge_start]);
             updated_face_nodes1 = circshift(face_nodes1, [0, 1 - idx_edge_start]);
+            need_to_switch = true;
         end
 
     elseif contact_type == "EdgeToEdge"
@@ -179,6 +192,8 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             idx_point = find(ismember(V2', point', 'rows'));
             updated_tri2 = circshift(V2, [0, 1 - idx_point]);
             updated_face_nodes2 = circshift(face_nodes2, [0, 1 - idx_point]);
+            need_to_switch = true;
+
         end
 
     elseif contact_type == "EdgeToFace"
@@ -191,9 +206,16 @@ function [dist, contact_type, tri_pair_updated, tri_pair_nodes_updated] = triang
             idx_edge_start = find(ismember(V2', edge(:,1)', 'rows'));
             updated_tri2 = circshift(V2, [0, 1 - idx_edge_start]);
             updated_face_nodes2 = circshift(face_nodes2, [0, 1 - idx_edge_start]);
+            need_to_switch = true;
+
         end
     end
 
-    tri_pair_updated = [reshape(updated_tri1,[9,1]); reshape(updated_tri2,[9,1])];
-    tri_pair_nodes_updated = [updated_face_nodes1, updated_face_nodes2];
+    if(need_to_switch)
+        tri_pair_updated = [reshape(updated_tri2,[9,1]); reshape(updated_tri1,[9,1])];
+        tri_pair_nodes_updated = [updated_face_nodes2, updated_face_nodes1];
+    else
+        tri_pair_updated = [reshape(updated_tri1,[9,1]); reshape(updated_tri2,[9,1])];
+        tri_pair_nodes_updated = [updated_face_nodes1, updated_face_nodes2];
+    end
 end
