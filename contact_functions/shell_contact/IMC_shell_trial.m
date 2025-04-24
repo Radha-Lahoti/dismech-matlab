@@ -1,8 +1,9 @@
 function [Fc, Jc, Ffr, Jfr, shell_imc] = ...
-    IMC_shell(shell_imc, q, q0, tri_combos, iter, dt, fvec_exceptIMC, fixedDOF)
+    IMC_shell_trial(shell_imc, q, q0, tri_combos, iter, dt, fvec_exceptIMC, fixedDOF)
 
 k_c = shell_imc.k_c;
 C = shell_imc.C;
+constraint_type = shell_imc.constraint_type;
 delta = shell_imc.delta;
 omega = shell_imc.omega;
 scale = shell_imc.scale;
@@ -20,17 +21,28 @@ if(iter==1) % run only on first iter
     [C, ~] = constructShellCandidateSet(q, tri_combos, candidate_lim, scale);
     if(~isempty(C)) % if collision is detected, update contact stiffness if necessary
         k_c = updateContactStiffnessNew(fvec_exceptIMC, C, fixedDOF);
+
+        % try: freeze contact type at first iter
+%         constraint_type = strings(1, size(C,1)) ;
+        for i = 1:size(C,1)
+            [~, constraint_type(i)] = triangleContactType(q, C(i,:), scale);
+        end
+
+%         if any(isnan(constraint_type))
+%             constraint_type
+%         end
+        
     end
 end
 if(~isempty(C))
-    [colliding_tri_combos, ~,~] = detectShellCollisions(q, C, delta, contact_len);
+    [colliding_tri_combos, colliding_constraint_types, ~,~] = detectShellCollisions_trial(q, C, constraint_type, delta, contact_len);
 
     use_hess = false; % if iter<omega compute only forces
     if (iter>omega) 
         use_hess = true; % compute Jacobian for convergence
     end
-    [Fc, Jc] = computeShellContact...
-        (q, colliding_tri_combos, delta, contact_len, scale, k_c, n_dof, use_hess);
+    [Fc, Jc] = computeShellContact_trial...
+        (q, colliding_tri_combos, colliding_constraint_types, delta, contact_len, scale, k_c, n_dof, use_hess);
 
     Ffr = zeros(n_dof, 1);
     Jfr = zeros(n_dof, n_dof);
@@ -42,5 +54,6 @@ else
 end
 shell_imc.C= C;
 shell_imc.k_c = k_c;
+shell_imc.constraint_type = constraint_type;
 
 end

@@ -43,6 +43,7 @@ if ismember("selfContact", env.ext_force_list)
     shell_imc.omega = 20; % # iters before jacobian for contact forces is used
     shell_imc.scale = 1/geom.shell_h;
     shell_imc.C = [];
+    shell_imc.constraint_type = string;
 
     if ismember("selfFriction", env.ext_force_list)
         imc.compute_friction = true;
