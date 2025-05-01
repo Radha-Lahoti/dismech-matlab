@@ -49,8 +49,19 @@ if ismember("selfContact", env.ext_force_list)
         imc.compute_friction = true;
         imc.mu_k = material.mu;
         imc.velTol = env.velTol;
+
+        % shell contact
+        shell_imc.compute_friction = true;
+        shell_imc.mu_k = material.mu;
+        shell_imc.velTol = env.velTol;
     else
         imc.compute_friction = false;
+        shell_imc.compute_friction = false;
+
+        imc.mu_k = [];
+        imc.velTol = [];
+        shell_imc.mu_k = [];
+        shell_imc.velTol = [];
     end
 end
 

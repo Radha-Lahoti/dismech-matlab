@@ -27,10 +27,6 @@ if(iter==1) % run only on first iter
         for i = 1:size(C,1)
             [~, constraint_type(i)] = triangleContactType(q, C(i,:), scale);
         end
-
-%         if any(isnan(constraint_type))
-%             constraint_type
-%         end
         
     end
 end

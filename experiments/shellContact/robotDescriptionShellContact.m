@@ -4,7 +4,7 @@ sim_params.static_sim = false;
 sim_params.TwoDsim = false;
 sim_params.use_midedge = false; % boolean var to decide on using midedge normal or 
 % hinge model for shell bending
-sim_params.use_lineSearch = true;
+sim_params.use_lineSearch = 0;
 sim_params.showFrames = false;
 sim_params.logStep = 1;
 sim_params.log_data = true;
@@ -39,11 +39,13 @@ material.poisson_rod = 0;
 material.poisson_shell = 0.5;
 
 %% external force list ["selfContact", "selfFriction", "floorContact", "floorFriction", "gravity", "buoyancy", "viscous", "aerodynamic","pointForce"]
-env.ext_force_list = ["selfContact"]; 
+env.ext_force_list = ["selfContact", "selfFriction"]; 
+% env.ext_force_list = ["selfContact"]; 
 
 % environment parameters
 env.g = [0, 0, -9.81]';
 material.contact_stiffness = 0.1;
+env.velTol = 1e-2;
 material.mu = 0.25;
 
 %% Input text file 

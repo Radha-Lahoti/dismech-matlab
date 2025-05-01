@@ -1,4 +1,4 @@
-function [intersects, pt] = segmentTriangleIntersection(p0, p1, tri)
+function [intersects, pt, tri_bary, seg_bary] = segmentTriangleIntersection(p0, p1, tri)
     a = tri(:,1); b = tri(:,2); c = tri(:,3);
     dir = p1 - p0;
     edge1 = b - a;
@@ -8,6 +8,8 @@ function [intersects, pt] = segmentTriangleIntersection(p0, p1, tri)
     if abs(det) < 1e-8
         intersects = false;
         pt = [];
+        tri_bary = [];
+        seg_bary = [];
         return;
     end
     inv_det = 1 / det;
@@ -18,4 +20,7 @@ function [intersects, pt] = segmentTriangleIntersection(p0, p1, tri)
     t = dot(edge2, q) * inv_det;
     intersects = (u >= 0) && (v >= 0) && (u + v <= 1) && (t >= 0) && (t <= 1);
     pt = p0 + t * dir;
+
+    tri_bary = [1 - u - v; u; v];
+    seg_bary = [1 - t; t];
 end

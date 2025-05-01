@@ -6,10 +6,10 @@ C = shell_imc.C;
 delta = shell_imc.delta;
 omega = shell_imc.omega;
 scale = shell_imc.scale;
-% velTol = shell_imc.velTol;
+velTol = shell_imc.velTol;
 contact_len = shell_imc.contact_len;
-% mu_k = shell_imc.mu_k;
-% friction_present = shell_imc.compute_friction;
+mu_k = shell_imc.mu_k;
+friction_present = shell_imc.compute_friction;
 
 
 col_lim = 100*delta;
@@ -29,11 +29,16 @@ if(~isempty(C))
     if (iter>omega) 
         use_hess = true; % compute Jacobian for convergence
     end
-    [Fc, Jc] = computeShellContact...
-        (q, colliding_tri_combos, delta, contact_len, scale, k_c, n_dof, use_hess);
+%     [Fc, Jc] = computeShellContact...
+%         (q, colliding_tri_combos, delta, contact_len, scale, k_c, n_dof, use_hess);
 
-    Ffr = zeros(n_dof, 1);
-    Jfr = zeros(n_dof, n_dof);
+%     Ffr = zeros(n_dof, 1);
+%     Jfr = zeros(n_dof, n_dof);
+
+    [Fc, Jc, Ffr, Jfr] = computeShellContactAndFriction...
+        (q, q0, colliding_tri_combos, delta, contact_len, scale, k_c, mu_k, dt, velTol, n_dof, use_hess, friction_present);
+
+
 else 
     Fc = zeros(n_dof, 1);
     Jc = zeros(n_dof, n_dof);

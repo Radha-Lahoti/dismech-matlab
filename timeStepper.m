@@ -134,11 +134,11 @@ while ~solved % % error > sim_params.tol
 %         f = f - Fc - Ffr;
 %         J = J - Jc - Jfr;
 
-%         [Fc_shell, Jc_shell, Ffr_shell, Jfr_shell, shell_imc] = ...
-%             IMC_shell(shell_imc, q, q0, MultiRod.tri_combos, iter, sim_params.dt, f, MultiRod.fixedDOF);
         [Fc_shell, Jc_shell, Ffr_shell, Jfr_shell, shell_imc] = ...
-            IMC_shell_trial(shell_imc, q, q0, MultiRod.tri_combos, iter, sim_params.dt, f, MultiRod.fixedDOF);
- 
+            IMC_shell(shell_imc, q, q0, MultiRod.tri_combos, iter, sim_params.dt, f, MultiRod.fixedDOF);
+%         [Fc_shell, Jc_shell, Ffr_shell, Jfr_shell, shell_imc] = ...
+%             IMC_shell_trial(shell_imc, q, q0, MultiRod.tri_combos, iter, sim_params.dt, f, MultiRod.fixedDOF);
+%  
         f = f - Fc_shell - Ffr_shell;
         J = J - Jc_shell - Jfr_shell;
     end
