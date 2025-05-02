@@ -27,7 +27,7 @@ imc.omega = 20; % # iters before jacobian for contact forces is used
 imc.scale = 1/imc.h;
 imc.floor_has_friction = false;
 
-[F_floorContact, J_floorContact] = computeFloorContactAndFriction(imc, dt, q, q0, n_nodes, n_dof)
+[F_floorContact, J_floorContact] = computeFloorContactAndFriction_custom_ground(imc, dt, q, q0, n_nodes, n_dof)
 
 
 %% FDM check for gradient and hessian
@@ -40,7 +40,7 @@ for c = 1:n_dof
     q_change(c) = q(c) + change;
 
     % changes in the energy
-    [F_floorContact_change] = computeFloorContactAndFriction(imc, dt, q_change, q0, n_nodes, n_dof);
+    [F_floorContact_change] = computeFloorContactAndFriction_custom_ground(imc, dt, q_change, q0, n_nodes, n_dof);
 
 
     J_floor_contact_FDM(c,:) = (F_floorContact_change - F_floorContact) .* (1/change);

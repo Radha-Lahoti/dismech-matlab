@@ -127,14 +127,18 @@ for i = 1:num_inputs
     
             data = [tri_combo_input', tri_combo_input0];
             if (find(gradEc)) % only compute friction force if there is non-zero contact force
-                [friction_type,ffr] = computeShellFriction(data, ratios, fc, mu_k, dt, vel_tol);
+%                 [friction_type,ffr] = computeShellFriction(data, ratios, fc, mu_k, dt, vel_tol);
+                [friction_type,ffr] = computeShellFriction_noRatios(data, fc, mu_k, dt, vel_tol);
+
                 Ffr(ind) = Ffr(ind) - ffr';
     
                 if(use_hess)
                     if(friction_type=="ZeroVel")
                         jfr = zeros(18,18);
                     else
-                        jfr = computeShellFrictionJacobian(data, ratios, fc, jc, mu_k, dt, vel_tol, friction_type, constraint_type);
+%                         jfr = computeShellFrictionJacobian(data, ratios, fc, jc, mu_k, dt, vel_tol, friction_type, constraint_type);
+%                         jfr = computeShellFrictionJacobian_noRatios(data, fc, jc, mu_k, dt, vel_tol, friction_type, constraint_type);
+                        jfr = computeShellFrictionJacobian_noRatios_FDM(data, fc, jc, mu_k, dt, vel_tol, friction_type, constraint_type, ffr);
     
                     end
                     Jfr(ind,ind) = Jfr(ind,ind) - jfr;
